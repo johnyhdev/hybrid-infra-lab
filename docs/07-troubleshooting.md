@@ -50,10 +50,10 @@ Check the completion marker, clone, Ansible runtime, and inventory using these c
 
 ```bash
 test -f /var/log/cloud-init-done.tag && echo "cloud-init marker: present" || echo "cloud-init marker: missing"
-test -d /home/azureadmin/hybrid-infrastructure-lab && echo "repository clone: present" || echo "repository clone: missing"
+test -d /home/azureadmin/hybrid-infra-lab && echo "repository clone: present" || echo "repository clone: missing"
 /opt/ansible-venv/bin/ansible --version
 az login --identity
-cd /home/azureadmin/hybrid-infrastructure-lab/ansible
+cd /home/azureadmin/hybrid-infra-lab/ansible
 ./inventory/generate_inventory.sh
 ansible-inventory -i inventory/generated/azure.yml --graph
 ```
@@ -63,7 +63,7 @@ The inventory graph should show the control and workload groups. The CM currentl
 For Ansible failures:
 
 1. Verify CM routing and workload SSH TCP 22 access from `10.20.1.0/24`.
-2. From `/home/azureadmin/hybrid-infrastructure-lab/ansible`, run `./inventory/generate_inventory.sh` and `ansible-inventory -i inventory/generated/azure.yml --graph`; confirm the workload VM appears under the `workload` group.
+2. From `/home/azureadmin/hybrid-infra-lab/ansible`, run `./inventory/generate_inventory.sh` and `ansible-inventory -i inventory/generated/azure.yml --graph`; confirm the workload VM appears under the `workload` group.
 3. Verify the Terraform-generated internal SSH key exists on the CM and the matching public key was added to workloads.
 4. Inspect the failing task and host reachability; use the ping check in `ansible/run.sh`.
 5. Inspect the affected service with `systemctl` and `journalctl`, fix the role/source, and rerun.
