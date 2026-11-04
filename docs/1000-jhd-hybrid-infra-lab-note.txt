@@ -2009,3 +2009,119 @@ Changes to Outputs:
       + vm-workload-01 = (known after apply)
     }
 ```
+
+Code verify azure and tailscale
+
+```
+az vm list --resource-group "rg-hybrid-infra-lab" --show-details --query "[].{name:name,power:powerState,privateIp:privateIps}" --output table
+az network vnet subnet list --resource-group "rg-hybrid-infra-lab" --vnet-name "vnet-hybrid-infra" --output table
+az vm identity show --resource-group "rg-hybrid-infra-lab" --name "vm-cm-01" --output json
+```
+
+result
+```
+PS C:\01-dev\hybrid-infra-lab> az vm list --resource-group "rg-hybrid-infra-lab" --show-details --query "[].{name:name,power:powerState,privateIp:privateIps}" --output table
+Name            Power       PrivateIp
+--------------  ----------  -----------
+vm-cm-01        VM running  10.20.1.4
+vm-workload-01  VM running  10.20.2.4
+PS C:\01-dev\hybrid-infra-lab> az network vnet subnet list --resource-group "rg-hybrid-infra-lab" --vnet-name "vnet-hkPolicies    ProvisioningState    ResourceGroup
+---------------  -----------------------  ---------------  --------------------------------  -----------------------------------  -------------------  -------------------
+10.20.2.0/24     True                     snet-workload    Disabled                          Enabled                              Succeeded            rg-hybrid-infra-lab
+10.20.1.0/24     True                     snet-automation  Disabled                          Enabled                              Succeeded            rg-hybrid-infra-lab
+PS C:\01-dev\hybrid-infra-lab> az vm identity show --resource-group "rg-hybrid-infra-lab" --name "vm-cm-01" --output 
+json
+{
+  "type": "UserAssigned",
+  "userAssignedIdentities": {
+    "/subscriptions/8523e1c3-049c-4821-b08d-ba4c677080ac/resourceGroups/rg-hybrid-infra-lab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-cm": {
+      "clientId": "745d51c2-8812-4f9f-b8bc-0b375690e8b9",
+      "principalId": "26b06b80-a0b0-40c7-97c3-b7934444a1bf"
+    }
+  }
+}
+```
+
+### Verify Ansible services
+
+ssh azureadmin@vm-cm-01
+ssh azureadmin@100.87.181.126
+
+
+code
+```
+cd /home/azureadmin/hybrid-infra-lab/ansible
+az login --identity
+./inventory/generate_inventory.sh
+ansible-inventory -i inventory/generated/azure.yml --graph
+```
+result
+```
+azureadmin@vm-cm-01:~$ cd /home/azureadmin/hybrid-infra-lab/ansible
+azureadmin@vm-cm-01:~/hybrid-infra-lab/ansible$ az login --identity
+[
+  {
+    "environmentName": "AzureCloud",
+    "homeTenantId": "25249825-52b8-4478-bd14-bc39033c86d0",
+    "id": "8523e1c3-049c-4821-b08d-ba4c677080ac",
+    "isDefault": true,
+    "managedByTenants": [],
+    "name": "s2jhd",
+    "state": "Enabled",
+    "tenantId": "25249825-52b8-4478-bd14-bc39033c86d0",
+    "user": {
+      "assignedIdentityInfo": "MSI",
+      "name": "systemAssignedIdentity",
+      "type": "servicePrincipal"
+    }
+  }
+]
+azureadmin@vm-cm-01:~/hybrid-infra-lab/ansible$ ./inventory/generate_inventory.sh
+Inventory generated:
+all:
+  vars:
+    ansible_user: azureadmin
+    ansible_ssh_private_key_file: ~/.ssh/vm-cm-workload
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null'
+  children:
+    control:
+      hosts:
+        vm-cm-01:
+          ansible_host: 10.20.1.4
+          ansible_connection: local
+    workload:
+      hosts:
+        vm-workload-01:
+          ansible_host: 10.20.2.4
+azureadmin@vm-cm-01:~/hybrid-infra-lab/ansible$ ansible-inventory -i inventory/generated/azure.yml --graph
+@all:
+  |--@ungrouped:
+  |--@control:
+  |  |--vm-cm-01
+  |--@workload:
+  |  |--vm-workload-01
+```
+
+result
+```
+vm-workload-01 | CHANGED | rc=0 >>
+nginx: active
+sample-app: active
+postgresql: active
+node_exporter: active
+nginx response: Hybrid Infrastructure Lab - Application OK
+app response: Hybrid Infrastructure Lab - Application OK
+Node Exporter metrics:
+# HELP go_gc_duration_seconds A summary of the wall-time pause (stop-the-world) duration in garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0curl: (23) Failure writing output to destination
+```
+
+connect to vm-workload
+```
+ssh -i ~/.ssh/vm-cm-workload azureadmin@10.20.2.4
+```
+
+### Destroy the temporary VM environment
+
+## 08 — Limitations, Security Considerations, and Cleanup

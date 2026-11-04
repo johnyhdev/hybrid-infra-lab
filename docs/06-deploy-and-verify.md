@@ -72,7 +72,7 @@ ssh azureadmin@<CM_TAILSCALE_IP>
 Replace `<CM_TAILSCALE_IP>` with the address shown for `vm-cm-01` in Tailscale Admin Console → Machines. After connecting, run the following Bash commands on the CM to refresh Azure inventory. `az login --identity` uses the CM's attached managed identity; do not paste a user password or token:
 
 ```bash
-cd /home/azureadmin/hybrid-infrastructure-lab/ansible
+cd /home/azureadmin/hybrid-infra-lab/ansible
 az login --identity
 ./inventory/generate_inventory.sh
 ansible-inventory -i inventory/generated/azure.yml --graph
@@ -92,7 +92,7 @@ ansible workload \
 
 Expected: each `systemctl is-active` result is `active`; both port 80 and port 8080 return `Hybrid Infrastructure Lab - Application OK`; the Node Exporter request returns Prometheus text beginning with metric names. A failed command exits nonzero. PostgreSQL being active means the package/service is installed; this lab does not configure a database or connect the sample application to it. The app and metrics remain private; they are not expected to respond from the public Internet.
 
-To re-run full configuration after correcting a role or template, stay on the CM in `/home/azureadmin/hybrid-infrastructure-lab/ansible` and run `./run.sh`. This logs in with managed identity, regenerates inventory, waits for SSH reachability, and applies `playbooks/site.yml`. The separate `playbooks/remediation.yml` only starts the listed services; it does not perform full configuration. For diagnosis, use `ansible workload ... -m shell -a 'systemctl status <SERVICE> --no-pager; journalctl -u <SERVICE> -n 100 --no-pager'` with the same inventory/private-key/SSH arguments above. Do not add a Public IP to troubleshoot.
+To re-run full configuration after correcting a role or template, stay on the CM in `/home/azureadmin/hybrid-infra-lab/ansible` and run `./run.sh`. This logs in with managed identity, regenerates inventory, waits for SSH reachability, and applies `playbooks/site.yml`. The separate `playbooks/remediation.yml` only starts the listed services; it does not perform full configuration. For diagnosis, use `ansible workload ... -m shell -a 'systemctl status <SERVICE> --no-pager; journalctl -u <SERVICE> -n 100 --no-pager'` with the same inventory/private-key/SSH arguments above. Do not add a Public IP to troubleshoot.
 
 ## Destroy the temporary VM environment
 

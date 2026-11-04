@@ -4,7 +4,7 @@ This guide identifies the values a copy of this repository may need to change. I
 
 ## Audit scope snapshot
 
-- Upstream checked: public template `johnyhdev/hybrid-infrastructure-lab`, branch `main`, commit `5fea4e8` (2026-10-25). Recheck before relying on this comparison because upstream can advance.
+- Upstream checked: public template `johnyhdev/hybrid-infra-lab`, branch `main`, commit `5fea4e8` (2026-10-25). Recheck before relying on this comparison because upstream can advance.
 - Local branch at audit: `t-vm-v1`, commit `f3e283f`. Compared with upstream `main`, the pre-existing tracked differences were [docs/05-github-environments.md](05-github-environments.md) and [terraform/02-vmresource/main.tf](../terraform/02-vmresource/main.tf); the latter difference is a trigger comment. Preserve local changes when syncing with upstream.
 - `docs/999-johnyhdev-verify-note.md` is tracked locally and present in the public upstream tree. It contains author-specific verification output and identifiers, so do not copy those values into a clone. This audit does not edit the note or reproduce its contents. The owner should review whether it should remain public, inspect history, and rotate any actual secret if one is confirmed.
 - Local Terraform state, plan, tfvars, provider cache state, and generated Ansible inventory matched ignore rules and were not listed as tracked files in the current index. Their contents were deliberately not opened. This does not establish whether a similar file appeared in earlier Git history.

@@ -220,10 +220,10 @@ foreach ($environment in $environments) {
 
 Expect exactly one result for each environment, with issuer `https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange`, and the exact repository subject ending in that environment. An empty result means the FIC was created on the wrong app, has a different name, or was not created. Correct this before configuring/running the workflow.
 
-After verifying all five, make sure you Set-Location back to Gihub Repo hybrid-infrastructure-lab:
+After verifying all five, make sure you Set-Location back to Gihub Repo hybrid-infra-lab:
 
 ```powershell
-Set-Location "<your path github repo hybrid-infrastructure-lab>"
+Set-Location "<your path github repo hybrid-infra-lab>"
 ```
 
  Remove the temporary JSON files and confirm the directory is gone:
@@ -249,7 +249,7 @@ The final list should no longer contain the revoked name. Do not revoke a creden
 
 Before assigning workload-level RBAC roles, you must deploy the `01-identity` module to create the lab Resource Group and foundational identities.
 
-Now move to 01-identity folder (you are at root hybrid-infrastructure-lab now):
+Now move to 01-identity folder (you are at root hybrid-infra-lab now):
 ```powershell
 cd terraform/01-identity
 ```
